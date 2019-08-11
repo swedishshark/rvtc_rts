@@ -1,7 +1,7 @@
 class Drone {
 
-  Vec2 pos = new Vec2();
-  Vec2 dest = new Vec2();
+  PVector pos = new PVector();
+  PVector dest;
   color team;
   int size;
   int halfsize;
@@ -30,8 +30,10 @@ class Drone {
     if (is_active)
       stroke(255, 255, 0);
       
+    PVector delta = new PVector();
+
     if (is_moving)
-      delta = Vec2f(speed / frame_rate, speed / frame_rate);
+      delta = new PVector(float(speed) / float(globs.frame_rate), float(speed) / float(globs.frame_rate));
 
     pos = pos.add(delta);
 
@@ -41,7 +43,7 @@ class Drone {
   
   void move(int x, int y) {
     
-    dest = Vec2(x, y);
+    dest = new PVector(x, y);
     is_moving = true;
   }
   

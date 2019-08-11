@@ -1,51 +1,77 @@
 Drone[] playerDrones;
 Drone[] enemyDrones;
-int droneCount = 10;
-int frame_rate = 20;
 
-void setup() {
-  int screenWidth = 1280;
-  int screenHeight = 720;
-  int zoneWidth = int(float(screenWidth) * 0.1);
-  int playerX = screenWidth - zoneWidth - 30;
-  int enemyX = zoneWidth + 30;
-  int droneSize = 10;
-  color playerColor = color(0, 0, 255);
-  color enemyColor = color(255, 0, 0);
-  
-  frameRate(frame_rate);
+Colors colors = new Colors();
+Globals globs = new Globals();
 
-  size(1280, 720);
-  background(50, 150, 50);
-  fill (100, 100, 100);
-  //endzones
-  rect(0, 0, zoneWidth, screenHeight);
-  rect(screenWidth - zoneWidth, 0 , zoneWidth, screenHeight);
-  //towers
-  rectMode(CENTER);
-  fill(enemyColor);
-  rect(zoneWidth/2, screenHeight/2, 50, 50);
-  fill(playerColor);
-  rect(screenWidth - zoneWidth/2, screenHeight/2, 50, 50);
-  playerDrones = new Drone[droneCount];
-  enemyDrones = new Drone[droneCount];
-  int gapSize = (screenHeight - (droneCount * droneSize))/(droneCount + 1);
-  //complicated crap
-  for (int i=1; i<=droneCount; i++){
-    int y = (i*gapSize) + ((i - 1) * droneSize) + int(float(droneSize) / 2.0);
-    print(i, gapSize, droneSize, y);
-    print("\n");
-    playerDrones[i-1]=new Drone(playerX, y, droneSize, playerColor, i);
-    enemyDrones[i-1]=new Drone(enemyX, y, droneSize, enemyColor, i);
-  }
+void settings () {
+
+  size(int(globs.screen.x), int(globs.screen.y));
 }
 
+void setup() {
+
+  frameRate(globs.frame_rate);
+  setup_map();
+  setup_drones();
+  
+}
+
+void setup_drones() {
+  
+  //initial drone positions
+  int playerX = globs.screen.x - globs.zone.x - 30;
+  int enemyX = globs.zone.x + 30;
+
+  //create drone units
+  playerDrones = new Drone[globs.droneCount];
+  enemyDrones = new Drone[globs.droneCount];
+
+  //gaps between drones
+  int gapSize = (globs.screen.y - (globs.droneCount * globs.droneSize))/(globs.droneCount + 1);
+
+  //generate drone geometry
+  for (int i=1; i<=globs.droneCount; i++){
+    int y = (i*gapSize) + ((i - 1) * globs.droneSize) + int(float(globs.droneSize) / 2.0);
+
+    playerDrones[i-1]=new Drone(playerX, y, globs.droneSize, colors.player, i);
+    enemyDrones[i-1]=new Drone(enemyX, y, globs.droneSize, colors.enemy, i);
+  }
+
+}
+
+void setup_map() {
+
+  //set screen size and color
+  background(colors.background);
+  
+  // end zones
+  fill (colors.endZone);
+  rect(0, 0, int(globs.zone.x), int(globs.screen.y));
+  rect(globs.screen.x - globs.zone.x, 0 , globs.zone.x, globs.screen.y);
+  
+  //towers
+  rectMode(CENTER);
+  fill(colors.enemy);
+  rect(globs.zone.x/2, globs.screen.y/2, 50, 50);
+  fill(colors.player);
+  rect(globs.screen.x - globs.zone.x/2, globs.screen.y/2, 50, 50);
+  
+}
+
+//////////////////////////////////////////////////////////////
+////        DRAW ROUTINES
+//////////////////////////////////////////////////////////////
 void draw(){
   
   
   
   
 }
+
+///////////////////////////////////////////////////////////////
+////      INPUT PROCESSING
+///////////////////////////////////////////////////////////////
 
 void mouseClicked(){
   
@@ -59,7 +85,7 @@ void mouseClicked(){
 boolean droneSelected(){
   
 //test to see if drone is hit
- for (int i=0; i<droneCount; i++){
+ for (int i=0; i<globs.droneCount; i++){
  
    if (playerDrones[i].is_hit(mouseX, mouseY)){
      playerDrones[i].is_active = !playerDrones[i].is_active;
@@ -74,7 +100,7 @@ boolean droneSelected(){
 
 void moveOrder(){
   
-   for (int i=0; i<droneCount; i++){
+   for (int i=0; i<globs.droneCount; i++){
      
      if (playerDrones[i].is_active)
        playerDrones[i].move(mouseX, mouseY);
