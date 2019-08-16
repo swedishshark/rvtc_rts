@@ -64,8 +64,9 @@ void setup_map() {
 //////////////////////////////////////////////////////////////
 void draw(){
   
-  
-  
+  for(int i=0; i<globs.droneCount; i++){
+    playerDrones[i].update();
+  }
   
 }
 
@@ -89,7 +90,6 @@ boolean droneSelected(){
  
    if (playerDrones[i].is_hit(mouseX, mouseY)){
      playerDrones[i].is_active = !playerDrones[i].is_active;
-     playerDrones[i].update();
      return true;
     
    }
