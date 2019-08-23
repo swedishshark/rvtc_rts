@@ -36,11 +36,9 @@ class Drone {
       
 
     if (is_moving){
-          println(j);
-    println(position);
       position = PVector.add(direction, position);
       float d = position.dist(destination); 
-      is_moving = (d <= 2.0*delta); //<>//
+      is_moving = (d > 2.0*delta); //<>//
     }
 
     square(position.x, position.y, size);
