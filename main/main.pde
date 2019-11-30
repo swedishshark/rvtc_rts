@@ -1,8 +1,13 @@
 Drone[] playerDrones;
 Drone[] enemyDrones;
+Controller controller;
 
 Colors colors = new Colors();
 Globals globs = new Globals();
+HUD hud = new HUD();
+Grid grid = new Grid(3);
+Panel[] panels = new Panel[3];
+
 
 void settings () {
 
@@ -11,20 +16,17 @@ void settings () {
 
 void setup() {
   
-  rectMode(CENTER);
-  
-  globs.my_fn(1.0);
-  globs.my_fn(10);
- 
-  return
-  
   frameRate(globs.frame_rate);
   setup_map();
   setup_drones();
+  setup_panels();
+  controller = new Controller();
   
 }
 
 void setup_drones() {
+  
+  rectMode(CENTER);
   
   //initial drone positions
   int playerX = globs.screen.x - globs.zone.x - 30;
@@ -39,14 +41,10 @@ void setup_drones() {
 
   //generate drone geometry
   for (int i=0; i<globs.droneCount; i++){
-    int y = (i*gapSize) + ((i) * globs.droneSize) + int(float(globs.droneSize) / 2.0);
+    int y = ((i + 1) * gapSize) + ((i) * globs.droneSize) + int(float(globs.droneSize) / 2.0);
 
     playerDrones[i]=new Drone(playerX, y, globs.droneSize, colors.player, i + 1);
     enemyDrones[i]=new Drone(enemyX, y, globs.droneSize, colors.enemy, i + 1);
-    
-    Coordinate2 pos = randomPos();
-    enemyDrones[i].move(pos.x, pos.y);
-    
   
   }
 
@@ -59,9 +57,10 @@ void setup_map() {
   stroke(0, 0, 0);
   
   // end zones
+  rectMode(CENTER);
   fill (colors.endZone);
   rect(globs.zoneCenter[0].x, globs.zoneCenter[0].y, int(globs.zone.x), int(globs.screen.y));
-  rect(globs.zoneCenter[1].x, globs.zoneCenter[1].y, globs.zone.x, globs.screen.y);
+  rect(globs.zoneCenter[1].x - 1, globs.zoneCenter[1].y, globs.zone.x, globs.screen.y);
   
   //towers
   fill(colors.enemy);
@@ -71,15 +70,50 @@ void setup_map() {
   
 } //<>//
 
+void setup_panels() {
+  
+  panels[0] = hud.createPanel("Game Info");
+  panels[1] = hud.createPanel("Unit Info");
+  panels[2] = hud.createPanel("Targeting Info");
+  
+  //panels[0].data.set("Framerate", str(globs.frame_rate));
+  panels[0].data.set("Game Speed", str(globs.frame_rate));
+  
+  panels[1].data.set("ID", "None");
+  panels[1].data.set("Position", "()");
+  panels[1].data.set("Speed", "None");
+  panels[1].data.set("Direction", "()");
+  panels[1].data.set("Destination", "()");
+  panels[1].data.set("Orders", "None");
+  panels[1].data.set("HP", "None");
+  panels[1].data.set("Cells", "None");
+  panels[1].span = 28 * panels[1].textSz;
+  
+  panels[2].data.set("Targets", "None");
+  
+}
+
 //////////////////////////////////////////////////////////////
 ////        DRAW ROUTINES
 //////////////////////////////////////////////////////////////
 void draw(){
   setup_map();
+  
+  controller.update();
+  
   for(int i=0; i<globs.droneCount; i++){
-    playerDrones[i].update();
-    enemyDrones[i].update();
+  
+    enemyDrones[i].refresh();
+    playerDrones[i].refresh();
+  
   }
+  
+  grid.refresh();
+  
+  pushMatrix();
+    translate(globs.screen.x - hud.width - 1, globs.screen.y - hud.height - 1);
+    hud.refresh(panels);
+  popMatrix();
   
 }
 
@@ -88,51 +122,30 @@ void draw(){
 ///////////////////////////////////////////////////////////////
 
 void mouseClicked(){
-  
-  if (droneSelected())
-    return;
-    
-  moveOrder();
+
+  controller.mouseClick();
   
 }
 
-boolean droneSelected(){
-  
-//test to see if drone is hit
- for (int i=0; i<globs.droneCount; i++){
- 
-   if (playerDrones[i].is_hit(mouseX, mouseY)){
-     playerDrones[i].is_active = !playerDrones[i].is_active;
-     return true;
-    
-   }
- }  
- return false;
-
-}
-
-void moveOrder(){
-  
-   for (int i=0; i<globs.droneCount; i++){
-     
-     if (playerDrones[i].is_active)
-       playerDrones[i].move(mouseX, mouseY);
-   }
-   
-
-}
 //keypressed test
 void keyPressed(){
     
-    println(key);
-    
+
     if (key == '=')
-      globs.frame_rate = globs.frame_rate + 1;
+      globs.frame_rate = globs.frame_rate + 2;
+        
       
-    if (key == '-')
-      globs.frame_rate = globs.frame_rate - 1;
-    
+    else if (key == '-')
+      globs.frame_rate = globs.frame_rate - 2;
+      
+    else if (key == 'h') {
+      hud.is_visible = !hud.is_visible;
+      droneHudUp = hud.is_visible;
+    }
     frameRate(globs.frame_rate);
+    
+    panels[0].data.set("Game Speed", str(globs.frame_rate));
+    
     }   
   
   //////////////////////////////////////////////

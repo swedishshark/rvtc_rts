@@ -9,4 +9,8 @@ class Coordinate2 {
       y = y_val;
     
   }
+  
+  String dump() {
+    return ("(" + str(x) + ", " + str(y) + ")");
+  }
 }
