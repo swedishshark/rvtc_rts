@@ -45,7 +45,7 @@ void setup_drones() {
 
     playerDrones[i]=new Drone(playerX, y, globs.droneSize, colors.player, i + 1);
     enemyDrones[i]=new Drone(enemyX, y, globs.droneSize, colors.enemy, i + 1);
-  
+    enemyDrones[i].move(randomPos());  
   }
 
 }

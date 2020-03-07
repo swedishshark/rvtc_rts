@@ -52,8 +52,17 @@ class Drone {
     idNumber = id;
     this.update();
     hitBox = new BoundingBox(x, y, size);
+    //hitBox.boxStroke = color(255,0,0);
+    //hitBox.boxFill = color(0,0,0,255);
+
     sightBox = new BoundingBox(x, y, int(sightRange));
+    //sightBox.boxStroke = color(255,0,0);
+    //sightBox.boxFill = color(0,0,0,100);
+    
     shootingBox = new BoundingBox(x, y, int(shootingRange));
+    shootingBox.boxStroke = color(255,0,0);
+    shootingBox.fillAlpha = 0.0;
+    
     if(team == colors.player)
       name = "player.";
     else //<>//
@@ -62,6 +71,23 @@ class Drone {
     name += str(id);
     
   }
+  String getDroneIDs(){
+  
+    String result = "";
+    
+    for(Drone target : droneList){
+    
+      if(result == "")
+        result = target.name;
+      else
+        result += ", " + target.name;
+    
+    }
+    
+    return result;
+  
+  }
+  
   String getTargetIDs(){
   
     String result = "";
@@ -79,7 +105,11 @@ class Drone {
   
   }
   String getCellIDs(){
-  
+    ///////////////////
+    // Get the ID numbers of the cells to which the drone belongs
+    // Return as a string
+    //////////////////
+    
     String result = "";
     
     for(int i = 0; i < cellsList.size(); i++){
@@ -94,7 +124,10 @@ class Drone {
   }
   
   void update(){
-    
+    ///////////////
+    // Update the position and bounding boxes of the drone
+    ///////////////
+
     s++;
     
     if(!is_moving)
@@ -110,9 +143,14 @@ class Drone {
   }
   
   void update_targets(){
+    /////////////////////////////////
+    // Update the targets in range
+    /////////////////////////////////
   
+    //Iterate each cell in the cell list
     for(Cell currentCell: cellsList){
       
+      //Iterate each drone in the cell
       for(Drone d: currentCell.droneList){
         
         if(is_active && match(name, "enemy") == null)
@@ -121,14 +159,16 @@ class Drone {
             if(d.name != name)
               //println("\tcollide", s);
         
+        //in range if the sight boxes collide
         if(sightBox.collide(d.sightBox))
           
           if(!targetList.contains(d))
              targetList.add(d);
         
+        //remove previous in range targets 
         else
         
-          if(targetList.contains(d.sightBox))
+          if(targetList.contains(d))
             targetList.remove(d);
       }
     
@@ -138,19 +178,25 @@ class Drone {
   
   void refresh(){
   
+    if (droneHudUp){
+      sightBox.refresh(); 
+      shootingBox.refresh();
+
+      //hitBox.refresh(); 
+  }
+    
     rectMode (CENTER);
     fill(team);
     stroke(team);
-    
+
     if (is_active)
       stroke(255, 255, 0);
-    
+
     square(position.x, position.y, float(size));
-    if (droneHudUp){
-      hitBox.refresh(); 
-      sightBox.refresh(); 
-      shootingBox.refresh(); 
-  }
+    
+    if (droneHudUp)
+      fill(0, 0, 0);
+      text(this.idNumber, this.position.x - size/2 + 1, this.position.y + size/2 - 1);
   }
   
   void move(Coordinate2 pos) {

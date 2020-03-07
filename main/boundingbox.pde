@@ -9,8 +9,9 @@ class BoundingBox{
   int sizeX;
   int sizeY;
   color boxStroke = color(0, 0, 0); 
-  color boxFill = color(0, 0, 0, 100);
-  
+  color boxFill = color(0, 0, 0);
+  float fillAlpha = 75.0;
+
   BoundingBox(int x1, int y1, int x2, int y2){
   
     left = x1;
@@ -74,7 +75,9 @@ class BoundingBox{
     rectMode(CORNERS);
 
     stroke(boxStroke);
-    fill(boxFill);
+     fill(boxFill, fillAlpha);
+
+
     rect(this.left, this.top, this.right, this.bottom);
 
   }

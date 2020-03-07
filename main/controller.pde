@@ -1,5 +1,7 @@
 class Controller{
 
+  int selectedDrone = -1;
+
   Controller(){
   
   
@@ -17,8 +19,8 @@ class Controller{
       enemyDrones[i].update();
       
       //give enemy drone new pos
-      if (!enemyDrones[i].is_moving)    
-        enemyDrones[i].move(randomPos()); 
+      //if (!enemyDrones[i].is_moving)    
+      //  enemyDrones[i].move(randomPos()); 
         
       //test for drone collision detec.  
       playerDrones[i].cellsList.clear();
@@ -40,32 +42,48 @@ class Controller{
       
     }
     
+    //Iterate each cell in the array
     for(int i=0; i<grid.cellArray.length; i++){
       
       Cell cell = grid.cellArray[i];
 
+      //iterate each drone in the cell
       for(int j=0; j<cell.droneList.size() - 1; j++){
       
         Drone sourceDrone = cell.droneList.get(j);
 
-       
+        //iterate every other drone in the list
         for(int k=j+1; k<cell.droneList.size(); k++){
           
             Drone targetDrone = cell.droneList.get(k);
 
-            
+            //test for collision, ;adding each drone to the other's list
             if(sourceDrone.sightBox.collide(targetDrone.sightBox)){
 
               targetDrone.droneList.add(sourceDrone);
               sourceDrone.droneList.add(targetDrone);
-              
             
             }
-          
+
         }
-      
+
       }
-    
+      
+      updateHud();
+      
+      //debug output
+      /*
+      for(int j=0; j<cell.droneList.size(); j++) {
+        
+        Drone s = cell.droneList.get(j);
+        
+        print("\n",s.name);
+        
+        for(int k=0; k<s.droneList.size(); k++) {
+          print("\n\t",s.droneList.get(k).name);
+        }
+      }
+    */
     }
     
   }
@@ -126,6 +144,7 @@ class Controller{
        
      } 
    }
+   
    if (id == -1) {
      
     panels[1].data.set("ID", "-1");
@@ -136,18 +155,23 @@ class Controller{
     panels[1].data.set("Orders", "None"); 
     panels[1].data.set("HP", "None");
     
-   } else {
+   }
+   
+   selectedDrone = id;
+   print("selected drone=",selectedDrone);
+   return drone_selected;
+  }
+
+  void updateHud() {
+    if (selectedDrone == -1)
+      return;
      
-    Drone drone = playerDrones[id];
-    panels[1].data.set("ID", str(id));
+    Drone drone = playerDrones[selectedDrone];
+    panels[1].data.set("ID", str(selectedDrone));
     panels[1].data.set("Speed", str(drone.speed));
     panels[1].data.set("Orders", "Move");
     panels[1].data.set("HP", str(drone.health));
-    panels[2].data.set("Targets", drone.getTargetIDs());
-    
-   }
-   
-   return drone_selected;
+    panels[2].data.set("Targets", drone.getDroneIDs());
   
   }
   
