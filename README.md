@@ -1,2 +1,2 @@
 # reallyverytotallycoolRTS
-Total Annihilation-type RTS
+A Total Annihilation-type RTS
